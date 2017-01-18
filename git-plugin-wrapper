@@ -1,25 +1,29 @@
 #!/usr/bin/env python3
 
 import argparse
+import getpass
 
 def print_version():
 	print("0.1")
 	
-def print_usage():
-	print("git myPlugin [add-since|add-author]")
-	
-def start_smart_work(since=True, author=True):
+def start_smart_work(since=None, author=None):
 	print("Starting smart work...")
+	if (since):
+		print("Adding since = ", since)
+		
+	if (author):
+		print("Adding author = ", author)
+		
 	print("Done")
-	
 	
 def main():
 	print("ran plugin wrapper!")
 	
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-v", "--version", help="Display the version of this plugin", action='store_true')
-	parser.add_argument("--since", help="Add the @since annotations to project", action='store_true')
-	parser.add_argument("--author", help="Add the @author annotations to project", action='store_true')
+	parser.add_argument("--since", nargs='?', help="Add the @since annotations to project")
+	parser.add_argument("--author", nargs='?', help="Add the @author annotations to project", const=getpass.getuser())
+	
 	
 	args = parser.parse_args()
 	
@@ -27,9 +31,7 @@ def main():
 		print_version()
 		return
 	
-	add_since  = True if args.since else False
-	add_author = True if args.author else False
-	start_smart_work(add_since, add_author)
+	start_smart_work(args.since, args.author)
 	
 
 if __name__ == "__main__":
