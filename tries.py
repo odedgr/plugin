@@ -27,14 +27,61 @@ def extract_javadoc(filename=None):
 
     # javadoc = match2.group()
     javadoc = match.group(1)
-    print(javadoc)
-    if re.search("@since", javadoc, re.DOTALL):
-        print("ALREADY HAS THE @since TAG")
-    else:
-        print("DOES NOT HAVE THE @since TAG")
+    print('Extracted Javadoc:\n {}'.format(javadoc))
+    # if re.search("@since", javadoc, re.DOTALL):
+    #     print("ALREADY HAS THE @since TAG")
+    # else:
+    #     print("DOES NOT HAVE THE @since TAG")
 
     return javadoc
 
+
+def has_tag(javadoc=None, tag=None):
+    if tag is None:
+        raise ValueError('No tag supplied')
+
+    if not re.search('@[a-zA-Z]+', tag):
+        raise ValueError('invalid tag format')
+
+    if javadoc is None:
+        return False
+
+    res = True if re.search(tag, javadoc, re.DOTALL) else False
+    return res
+
+
+def has_since_tag(javadoc=None):
+    """
+    Check if the given javadoc string contains the '@since' tag or not.
+
+    :param javadoc: string to be searched for the '@since' tag
+    :return: True if given javadoc string containts the '@since' tag, 'False' otherwise
+    """
+
+    if javadoc is None:
+        return False
+
+    return re.search("@since", javadoc, re.DOTALL)
+
+
+def has_author_tag(javadoc=None):
+    """
+    Check if the given javadoc string contains the '@author' tag or not.
+
+    :param javadoc: string to be searched for the '@since' tag
+    :return: True if given javadoc string containts the '@since' tag, 'False' otherwise
+    """
+
+    if javadoc is None:
+        return False
+
+    return re.search("@since", javadoc, re.DOTALL)
+
+
 if __name__ == '__main__':
-    extract_javadoc('AllTags.java')
-    extract_javadoc('NoTags.java')
+    jdoc = extract_javadoc('AllTags.java')
+    print('has @since: {}'.format(has_tag(jdoc, '@since')))
+    print('has @author: {}'.format(has_tag(jdoc, '@author')))
+    jdoc = extract_javadoc('NoTags.java')
+    print('has @since: {}'.format(has_tag(jdoc, '@since')))
+    print('has @author: {}'.format(has_tag(jdoc, '@author')))
