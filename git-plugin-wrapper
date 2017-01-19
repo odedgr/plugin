@@ -3,37 +3,38 @@
 import argparse
 import getpass
 
+
 def print_version():
-	print("0.1")
-	
+    print("0.1")
+
+
 def start_smart_work(since=None, author=None):
-	print("Starting smart work...")
-	if (since):
-		print("Adding since = ", since)
-		
-	if (author):
-		print("Adding author = ", author)
-		
-	print("Done")
-	
+    print("Starting smart work...")
+    if since:
+        print("Adding since = ", since)
+
+    if author:
+        print("Adding author = ", author)
+
+    print("Done")
+
+
 def main():
-	print("ran plugin wrapper!")
-	
-	parser = argparse.ArgumentParser()
-	parser.add_argument("-v", "--version", help="Display the version of this plugin", action='store_true')
-	parser.add_argument("--since", nargs='?', help="Add the @since annotations to project")
-	parser.add_argument("--author", nargs='?', help="Add the @author annotations to project", const=getpass.getuser())
-	
-	
-	args = parser.parse_args()
-	
-	if args.version:
-		print_version()
-		return
-	
-	start_smart_work(args.since, args.author)
-	
+    print("ran plugin wrapper!")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--version", help="Display the version of this plugin", action='store_true')
+    parser.add_argument("--since", nargs='?', help="Add the @since annotations to project")
+    parser.add_argument("--author", nargs='?', help="Add the @author annotations to project", const=getpass.getuser())
+
+    args = parser.parse_args()
+
+    if args.version:
+        print_version()
+        return
+
+    start_smart_work(args.since, args.author)
+
 
 if __name__ == "__main__":
-	main()
-
+    main()
