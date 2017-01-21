@@ -1,6 +1,6 @@
 import re
-
-
+import os
+import glob
 def extract_javadoc(filename=None):
     """
     Extract the javadoc string from the top-level class in the file.
@@ -12,7 +12,7 @@ def extract_javadoc(filename=None):
         print("no filename provided")
         return
 
-    print('extracting Javadoc from {}'.format(filename))
+    #print('extracting Javadoc from {}'.format(filename))
     pattern_multiline_with_javadoc_upto_class = "(\/\*\*.*?\*\/).*?class"
 
     with open(filename) as file_content:
@@ -27,7 +27,7 @@ def extract_javadoc(filename=None):
 
     # javadoc = match2.group()
     javadoc = match.group(1)
-    print('Extracted Javadoc:\n {}'.format(javadoc))
+    #print('Extracted Javadoc:\n {}'.format(javadoc))
     # if re.search("@since", javadoc, re.DOTALL):
     #     print("ALREADY HAS THE @since TAG")
     # else:
@@ -61,7 +61,7 @@ def has_since_tag(javadoc=None):
     if javadoc is None:
         return False
 
-    return re.search("@since", javadoc, re.DOTALL)
+    return has_tag(javadoc, "@since")
 
 
 def has_author_tag(javadoc=None):
@@ -75,13 +75,58 @@ def has_author_tag(javadoc=None):
     if javadoc is None:
         return False
 
-    return re.search("@since", javadoc, re.DOTALL)
+    return has_tag(javadoc, "@author")
 
+def add_tags(file=None, javadoc=None, since=None, author=None):
+    """
+    Adds @since and/or @author tags to the given file .
+    :param file: file to add tags to
+    :param javadoc: javadoc string from the top-level class in the file
+    :param since: since string to add to the '@since' tag, 'None' if no need to add since
+    :param author: author string to add to the '@author' tag, 'None' if no need to add author
+    """
+
+    # no file specified or no need to add any tags
+    if file is None or (since is None and author is None): 
+	    print("for file:", file, "not adding tags")
+	    return
+    print("for file:", file, "- adding_since:", since, ",adding_author:", author)
+    # f=open(file,'w')
+    # lines=f.readlines()
+    # f.close()
+    # f=open(file,'w')
+    # for line in lines:
+    #     newline = "No you are not"
+    #     f.write(newline)
+    # f.close()
+
+
+
+def update_tags(since=None, author=None):
+    """
+    Adds @since and/or @author tags to the given file .
+    :param since: since string to add to the '@since' tag, 'None' if no need to add since
+    :param author: author string to add to the '@author' tag, 'None' if no need to add author
+    """
+
+    for file in glob.glob('./*.java'):
+		# print(file)
+        sinceToUse = since
+        authorToUse = author
+        jdoc = extract_javadoc(file)
+        if (has_since_tag(jdoc)):
+			#print("file", file, "has since tag")
+            sinceToUse = None
+        if (has_author_tag(jdoc)):
+            #print("file", file, "has author tag")
+            authorToUse = None
+        add_tags(file, jdoc, sinceToUse, authorToUse)
 
 if __name__ == '__main__':
-    jdoc = extract_javadoc('AllTags.java')
-    print('has @since: {}'.format(has_tag(jdoc, '@since')))
-    print('has @author: {}'.format(has_tag(jdoc, '@author')))
-    jdoc = extract_javadoc('NoTags.java')
-    print('has @since: {}'.format(has_tag(jdoc, '@since')))
-    print('has @author: {}'.format(has_tag(jdoc, '@author')))
+    # jdoc = extract_javadoc('AllTags.java')
+    # print('has @since: {}'.format(has_tag(jdoc, '@since')))
+    # print('has @author: {}'.format(has_tag(jdoc, '@author')))
+    # jdoc = extract_javadoc('NoTags.java')
+    # print('has @since: {}'.format(has_tag(jdoc, '@since')))
+    # print('has @author: {}'.format(has_tag(jdoc, '@author')))
+    update_tags('1.6','Avner')
