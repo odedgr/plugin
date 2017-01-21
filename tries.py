@@ -1,6 +1,44 @@
 import re
 import os
 import glob
+
+def find_javadoc(filename=None):
+    """
+    Find the javadoc string of the top-level class in the file.
+
+    :param filename: Name of file from which to extract the javadoc
+    :return: match object of the javadoc
+    """
+    pattern_multiline_with_javadoc_upto_class = "(\/\*\*.*?\*\/).*?class"
+
+    with open(filename) as file_content:
+        content = file_content.read()
+
+    return re.search(pattern_multiline_with_javadoc_upto_class, content, re.DOTALL)
+
+def find_imports(filename=None):
+    """
+    Find the top-level class declaration in the file.
+
+    :param filename: Name of file from which to extract the class declaration
+    :return: match object of the class declaration
+    """
+    # pattern_imports = '.*package\s*(.*)$'
+    
+    pattern_imports = "^[\s]*package.*[\n]?(?![\n\r]{1,2}import)"
+
+    pattern_with_annotations =  "@.*?class"
+    # pattern_imports = "^.*?class"
+
+    with open(filename) as file_content:
+        content = file_content.read()
+
+    # print("find with annotatins: ", re.search(pattern_with_annotations, content, re.DOTALL).group(0))
+
+    print("find class: \n" + re.search(pattern_imports, content, re.DOTALL).group(0))
+    for line in content
+    return re.search(pattern_imports, content, re.DOTALL)
+
 def extract_javadoc(filename=None):
     """
     Extract the javadoc string from the top-level class in the file.
@@ -12,26 +50,11 @@ def extract_javadoc(filename=None):
         print("no filename provided")
         return
 
-    #print('extracting Javadoc from {}'.format(filename))
-    pattern_multiline_with_javadoc_upto_class = "(\/\*\*.*?\*\/).*?class"
+    match = find_javadoc(filename)
+    if match is None:
+        return None
 
-    with open(filename) as file_content:
-        content = file_content.read()
-
-    match = re.search(pattern_multiline_with_javadoc_upto_class, content, re.DOTALL)
-    # print(match.group(0))
-    # print(match.group(1))
-    # print(match.group())
-    # match2 = re.search("\/\*\*.*\*\/", match.group(), re.DOTALL)
-    # print(match2.group())
-
-    # javadoc = match2.group()
     javadoc = match.group(1)
-    #print('Extracted Javadoc:\n {}'.format(javadoc))
-    # if re.search("@since", javadoc, re.DOTALL):
-    #     print("ALREADY HAS THE @since TAG")
-    # else:
-    #     print("DOES NOT HAVE THE @since TAG")
 
     return javadoc
 
@@ -90,26 +113,41 @@ def add_tags(file=None, javadoc=None, since=None, author=None):
     if file is None or (since is None and author is None): 
 	    print("for file:", file, "not adding tags")
 	    return
-    print("for file:", file, "- adding_since:", since, ",adding_author:", author)
-    # f=open(file,'w')
-    # lines=f.readlines()
-    # f.close()
-    # f=open(file,'w')
-    # for line in lines:
-    #     newline = "No you are not"
-    #     f.write(newline)
-    # f.close()
+    if javadoc is None:
+        javadoc="/**\n*/\n"
+    if since is not None and author is not None:
+        javadoc = re.sub("\/\*\*","/**\n * @author " + author + "\n * @since " + since ,javadoc)
+    elif since is not None:
+        javadoc = re.sub("\/\*\*","/**\n * @since " + since,javadoc)
+    else: #author is not None
+        javadoc = re.sub("\/\*\*","/**\n * @author " + author ,javadoc)
+    with open(file, 'r+') as f:
+        java_doc_location = find_javadoc(file)
+        original_text = f.read()
+        if java_doc_location is None:
+            # this is when no java doc is present
+            imports = find_imports(file)
+            before_doc = original_text[:imports.end()]
+            after_doc = original_text[imports.end():]
 
+        else:
+            class_def_len = len(java_doc_location.group(0)) - len(java_doc_location.group(1))
+            before_doc = original_text[:java_doc_location.start()]
+            after_doc = original_text[java_doc_location.end()-class_def_len:]
+        text = before_doc + javadoc + after_doc
+        f.seek(0)
+        f.write(text)
+        f.truncate()
 
 
 def update_tags(since=None, author=None):
     """
-    Adds @since and/or @author tags to the given file .
+    Adds @since and/or @author tags to all files in the current directory recursively.
     :param since: since string to add to the '@since' tag, 'None' if no need to add since
     :param author: author string to add to the '@author' tag, 'None' if no need to add author
     """
 
-    for file in glob.glob('./*.java'):
+    for file in glob.glob('./**/*.java', recursive=True):
 		# print(file)
         sinceToUse = since
         authorToUse = author
@@ -123,10 +161,4 @@ def update_tags(since=None, author=None):
         add_tags(file, jdoc, sinceToUse, authorToUse)
 
 if __name__ == '__main__':
-    # jdoc = extract_javadoc('AllTags.java')
-    # print('has @since: {}'.format(has_tag(jdoc, '@since')))
-    # print('has @author: {}'.format(has_tag(jdoc, '@author')))
-    # jdoc = extract_javadoc('NoTags.java')
-    # print('has @since: {}'.format(has_tag(jdoc, '@since')))
-    # print('has @author: {}'.format(has_tag(jdoc, '@author')))
-    update_tags('1.6','Avner')
+    update_tags("1.6", "Avner")
