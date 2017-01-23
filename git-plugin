@@ -3,8 +3,7 @@
 import argparse
 import getpass
 import re
-import os
-import glob
+from os import path, walk
 
 
 def print_version():
@@ -133,42 +132,47 @@ def update_tags(since=None, author=None):
     :param author: author string to add to the '@author' tag, 'None' if no need to add author
     """
 
-    path = '.'
+    path_root = '.'
 
     # in python 3.5+ we can use the following commented line to get a list of *.java files
     # glob.glob('./**/*.java', recursive=True):
 
-    files = [os.path.join(dirpath, f)
-             for dirpath, dirnames, files in os.walk(path)
+    files = [path.join(dirpath, f)
+             for dirpath, _, files in walk(path_root)
              for f in files if f.endswith('.java')]
 
     for f in files:
-        # print(file)
-        sinceToUse = since
-        authorToUse = author
         jdoc = extract_javadoc(f)
 
-        if has_since_tag(jdoc):
-            # print("file", file, "has since tag")
-            sinceToUse = None
+        since = None if has_since_tag(jdoc) else since
+        author = None if has_author_tag(jdoc) else since
 
-        if has_author_tag(jdoc):
-            # print("file", file, "has author tag")
-            authorToUse = None
+        add_tags(f, jdoc, since, author)
 
-        add_tags(f, jdoc, sinceToUse, authorToUse)
-
-
-
+        # sinceToUse = since
+        # authorToUse = author
+        #
+        # if has_since_tag(jdoc):
+        #     # print("file", file, "has since tag")
+        #     sinceToUse = None
+        #
+        # if has_author_tag(jdoc):
+        #     # print("file", file, "has author tag")
+        #     authorToUse = None
+        #
+        # add_tags(f, jdoc, sinceToUse, authorToUse)
 
 
 def start_smart_work(since=None, author=None):
     print("Starting smart work...")
+
     if since:
         print("Adding since = ", since)
 
     if author:
         print("Adding author = ", author)
+
+    update_tags(since, author)
 
     print("Done")
 
