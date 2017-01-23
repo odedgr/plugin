@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+
+import argparse
+import getpass
+import re
+import os
+import glob
+
+
+def print_version():
+    print("0.1")
+
+
+def find_javadoc(filename=None):
+    """
+    Find the javadoc string of the top-level class in the file.
+
+    :param filename: Name of file from which to extract the javadoc
+    :return: match object of the javadoc
+    """
+    pattern_multiline_with_javadoc_upto_class = "(\/\*\*.*?\*\/).*?class"
+
+    with open(filename) as file_content:
+        content = file_content.read()
+
+    return re.search(pattern_multiline_with_javadoc_upto_class, content, re.DOTALL)
+
+
+def extract_javadoc(filename=None):
+    """
+    Extract the javadoc string from the top-level class in the file.
+
+    :param filename: Name of file from which to extract the javadoc
+    :return: Javadoc string from top-level class in given file
+    """
+    if filename is None:
+        print("no filename provided")
+        return
+
+    match = find_javadoc(filename)
+    if match is None:
+        return None
+
+    javadoc = match.group(1)
+
+    return javadoc
+
+
+def has_tag(javadoc=None, tag=None):
+    if javadoc is None:
+        return False
+
+    if tag is None:
+        raise ValueError('No tag supplied')
+
+    if not re.search('@[a-zA-Z]+', tag):
+        raise ValueError('invalid tag format')
+
+    res = True if re.search(tag, javadoc, re.DOTALL) else False
+    return res
+
+
+def has_since_tag(javadoc=None):
+    """
+    Check if the given javadoc string contains the '@since' tag or not.
+
+    :param javadoc: string to be searched for the '@since' tag
+    :return: True if given javadoc string containts the '@since' tag, 'False' otherwise
+    """
+
+    return has_tag(javadoc, "@since")
+
+
+def has_author_tag(javadoc=None):
+    """
+    Check if the given javadoc string contains the '@author' tag or not.
+
+    :param javadoc: string to be searched for the '@since' tag
+    :return: True if given javadoc string containts the '@since' tag, 'False' otherwise
+    """
+
+    return has_tag(javadoc, "@author")
+
+
+def add_tags(filename=None, javadoc=None, since=None, author=None):
+    """
+    Adds @since and/or @author tags to the given file.
+
+    :param filename: file to add tags to
+    :param javadoc: javadoc string from the top-level class in the file
+    :param since: since string to add to the '@since' tag, 'None' if no need to add since
+    :param author: author string to add to the '@author' tag, 'None' if no need to add author
+    """
+
+    # no file specified or no need to add any tags
+    if filename is None or (since is None and author is None):
+        print("for file:", filename, "not adding tags")
+        return
+
+    if javadoc is None:
+        javadoc = "/**\n*/\n"
+    # if since is not None and author is not None:
+    #     javadoc = re.sub("\/\*\*", "/**\n * @author " + author + "\n * @since " + since, javadoc)
+    elif since is not None:
+        javadoc = re.sub("\/\*\*", "/**\n * @since " + since, javadoc)
+    else:
+        # author is not None
+        javadoc = re.sub("\/\*\*", "/**\n * @author " + author, javadoc)
+
+    with open(filename, 'r+') as f:
+        java_doc_location = find_javadoc(filename)
+        original_text = f.read()
+        if java_doc_location is None:
+            # this is when no java doc is present
+            imports = find_imports(filename)
+            before_doc = original_text[:imports.end()]
+            after_doc = original_text[imports.end():]
+        else:
+            class_def_len = len(java_doc_location.group(0)) - len(java_doc_location.group(1))
+            before_doc = original_text[:java_doc_location.start()]
+            after_doc = original_text[java_doc_location.end()-class_def_len:]
+
+        text = before_doc + javadoc + after_doc
+        f.seek(0)
+        f.write(text)
+        f.truncate()
+
+
+def update_tags(since=None, author=None):
+    """
+    Adds @since and/or @author tags to all files in the current directory recursively.
+    :param since: since string to add to the '@since' tag, 'None' if no need to add since
+    :param author: author string to add to the '@author' tag, 'None' if no need to add author
+    """
+
+    path = '.'
+
+    # in python 3.5+ we can use the following commented line to get a list of *.java files
+    # glob.glob('./**/*.java', recursive=True):
+
+    files = [os.path.join(dirpath, f)
+             for dirpath, dirnames, files in os.walk(path)
+             for f in files if f.endswith('.java')]
+
+    for f in files:
+        # print(file)
+        sinceToUse = since
+        authorToUse = author
+        jdoc = extract_javadoc(f)
+
+        if has_since_tag(jdoc):
+            # print("file", file, "has since tag")
+            sinceToUse = None
+
+        if has_author_tag(jdoc):
+            # print("file", file, "has author tag")
+            authorToUse = None
+
+        add_tags(f, jdoc, sinceToUse, authorToUse)
+
+
+
+
+
+def start_smart_work(since=None, author=None):
+    print("Starting smart work...")
+    if since:
+        print("Adding since = ", since)
+
+    if author:
+        print("Adding author = ", author)
+
+    print("Done")
+
+
+def main():
+    print("ran plugin wrapper!")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--version", help="Display the version of this plugin", action='store_true')
+    parser.add_argument("--since", nargs='?', help="Add the @since annotations to project")
+    parser.add_argument("--author", nargs='?', help="Add the @author annotations to project", const=getpass.getuser())
+
+    args = parser.parse_args()
+
+    if args.version:
+        print_version()
+        return
+
+    start_smart_work(args.since, args.author)
+
+
+if __name__ == "__main__":
+    main()
