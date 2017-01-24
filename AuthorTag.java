@@ -1,7 +1,7 @@
 package what.ever;
 
 /**
- * @author Oded
+ * @author oded
  */
 public class NoTags {
     private int ryan;
