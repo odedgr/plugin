@@ -50,8 +50,8 @@ The plugin is installed using a standard Makefile, and runs as a Git "command" f
 
 
 ## Examples
-A few short examples for input files can be found under the examples directory.
-To check the examples you should create a git directory and copy the input files into the directory.
+A few short examples for input files can be found under the tests directory.
+To check the examples you should create a git project ("$ git init") and copy the input files into the directory.
 You can put some of the files in a sub direcetory under the main directory (all nested directories are checked). 
 Open a terminal, 'cd' to the root git directory you created and type one of the following commands (each command is followed by its output and an explanation):
 - "$ git annotator --since" :
