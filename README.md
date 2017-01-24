@@ -25,9 +25,12 @@ The plugin is installed using a standard Makefile, and runs as a Git "command" f
 ## The Alogorithm
 1. parse the command line and extract the arguments.
 2. For each java file in the current project:
-	2.1. Find the javadoc of the top level class defined in the file.
+    
+    2.1. Find the javadoc of the top level class defined in the file.
+		
 		2.1.1 If javadoc doesn't exist, create an empty one.
 	2.2. Add the tags specified in the arguments with the values given (or default ones).
+	
 	2.3. rewrite the file with the updated javadoc in it's appropriate location.
 
 
@@ -44,9 +47,9 @@ The plugin is installed using a standard Makefile, and runs as a Git "command" f
 1. Open a terminal and 'cd' to the project's root directory (containing the '.git' directory)
 2. To get detailed usage information printed back in the terminal, use the '-h' flag, e.g: run "$ git annotator -h"
 3. To add a '@since' tag (annotation):
-  * $ git annotator --since [SINCE] where SINCE can be an arbitrary value (w/o whitespaces)
+- $ git annotator --since [SINCE] where SINCE can be an arbitrary value (w/o whitespaces)
 4. To add a '@author' tag (annotation):
-  * $ git annotator --author [AUTHOR] where SINCE can be an arbitrary value (w/o whitespaces)
+- $ git annotator --author [AUTHOR] where SINCE can be an arbitrary value (w/o whitespaces)
 
 
 ## Examples
