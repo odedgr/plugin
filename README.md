@@ -53,17 +53,18 @@ The plugin is installed using a standard Makefile, and runs as a Git "command" f
 A few short examples for input files can be found under the examples directory.
 To check the examples you should create a git directory and copy the input files into the directory.
 You can put some of the files in a sub direcetory under the main directory (all nested directories are checked). 
-Open a terminal, 'cd' to the root git directory you created and type one of the following commands (each command is followed by it's output):
+Open a terminal, 'cd' to the root git directory you created and type one of the following commands (each command is followed by its output and an explanation):
 - "$ git annotator --since" :
-
+    ```
 	Adding since = 24-1-2017
 	Processing file './test/AuthorTag.java'... @since => 24-1-2017 
-	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @since => 24-1-2017 
+	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @since => 24-1-2017
 	Processing file './test/AllTags.java'... skipping
-	Processing file './test/NoTagsWithJavadoc.java'... @since => 24-1-2017 
+	Processing file './test/NoTagsWithJavadoc.java'... @since => 24-1-2017
 	Processing file './test/SinceTag.java'... skipping
-	Processing file './test/NoJavadoc.java'... @since => 24-1-2017 
+	Processing file './test/NoJavadoc.java'... @since => 24-1-2017
 	Done
+    ```
 
     - AllTags.java had all tags defined so it's javadoc hasn't changed.
     SinceTag.java had the @since tag defined so it's javadoc hasn't changed.
@@ -71,28 +72,30 @@ Open a terminal, 'cd' to the root git directory you created and type one of the 
     - ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all so javadoc with the @since tag was added with the defualt value (current date).
 
 - "$ git annotator --since today" :
-
+    ```
 	Adding since = today
 	Processing file './test/AuthorTag.java'... @since => today 
-	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @since => today 
+	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @since => today
 	Processing file './test/AllTags.java'... skipping
-	Processing file './test/NoTagsWithJavadoc.java'... @since => today 
+	Processing file './test/NoTagsWithJavadoc.java'... @since => today
 	Processing file './test/SinceTag.java'... skipping
-	Processing file './test/NoJavadoc.java'... @since => today 
+	Processing file './test/NoJavadoc.java'... @since => today
 	Done
+    ```
 
     - Same as before with a value defined by the user ("today") instead of the default value (current date).
 
 - "$ git annotator --author" :
-
+    ```
 	Adding author = oded
 	Processing file './test/AuthorTag.java'... skipping
-	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @author => oded 
+	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @author => oded
 	Processing file './test/AllTags.java'... skipping
 	Processing file './test/NoTagsWithJavadoc.java'... @author => oded 
 	Processing file './test/SinceTag.java'... @author => oded 
 	Processing file './test/NoJavadoc.java'... @author => oded 
 	Done
+    ```
 
     - AllTags.java had all tags defined so it's javadoc hasn't changed.
     AuthorTag.java had the @author tag defined so it's javadoc hasn't changed.
@@ -100,15 +103,16 @@ Open a terminal, 'cd' to the root git directory you created and type one of the 
     - ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all so javadoc with the @author tag was added with the defualt value.
 
 - "$ git annotator --author Avner" :
-
-	Adding author = Avner
+    ```
+    Adding author = Avner
 	Processing file './test/AuthorTag.java'... skipping
-	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @author => Avner 
+	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @author => Avner
 	Processing file './test/AllTags.java'... skipping
 	Processing file './test/NoTagsWithJavadoc.java'... @author => Avner 
 	Processing file './test/SinceTag.java'... @author => Avner 
 	Processing file './test/NoJavadoc.java'... @author => Avner 
 	Done
+    ```
 
     - Same as before with a value defined by the user ("Avner") instead of the default value.
 
