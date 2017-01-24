@@ -224,23 +224,24 @@ def update_tags(since=None, author=None):
              for dirpath, _, files in walk('.')
              for f in files if f.endswith('.java')]
 
+    if len(files) == 0:
+        print("Found no relevant *.java files in the project");
+        return
+
     for f in files:
         print("Processing file '{}'... ".format(f), end="")
+
         jdoc = extract_javadoc(f)
-
-        line = ""
-
-        print("has since: {}, has author: {}".format(has_since_tag(jdoc), has_author_tag(jdoc)))
-        print("parameters: since= {}, author= {}".format(since, author))
-
         updated_since = None if has_since_tag(jdoc) else since
         updated_author = None if has_author_tag(jdoc) else author
 
-        print("after check: since= {}, author= {}".format(updated_since, updated_author))
+        # print("after check: since= {}, author= {}".format(updated_since, updated_author))
 
         if updated_since is None and updated_author is None:
             print("skipping")
             continue
+
+        line = ""
 
         if updated_since is not None:
             line += "since ==> @since: {} ".format(updated_since)
@@ -266,7 +267,9 @@ def do_hard_work(since=None, author=None):
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Git plugin for automatic insertion of @since and @author annotations "
+                                                 "into *.java source files in a project.",
+                                     epilog="© Avner & Oded")
     parser.add_argument("-v", "--version", help="Display the version of this plugin", action='store_true')
     parser.add_argument("--since", nargs='?', help="Add the @since annotations to project")
     parser.add_argument("--author", nargs='?', help="Add the @author annotations to project", const=getpass.getuser())
@@ -276,6 +279,12 @@ def main():
     if args.version:
         print_version()
         return
+
+    if args.since is None and args.author is None:
+        print("No option selected.")
+        return
+
+    print("since = {}, author = {}".format(args.since, args.author))
 
     do_hard_work(args.since, args.author)
 

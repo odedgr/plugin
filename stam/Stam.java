@@ -1,6 +1,5 @@
 package what.ever;
 
-
 public class NoTags {
     private int ryan;
 
