@@ -25,13 +25,10 @@ The plugin is installed using a standard Makefile, and runs as a Git "command" f
 ## The Alogorithm
 1. parse the command line and extract the arguments.
 2. For each java file in the current project:
-    
-    2.1. Find the javadoc of the top level class defined in the file.
-		
-		2.1.1 If javadoc doesn't exist, create an empty one.
-	2.2. Add the tags specified in the arguments with the values given (or default ones).
-	
-	2.3. rewrite the file with the updated javadoc in it's appropriate location.
+    1. Find the javadoc of the top level class defined in the file.
+        1. If javadoc doesn't exist, create an empty one.
+    2. Add the tags specified in the arguments with the values given (or default ones).
+    3. rewrite the file with the updated javadoc in it's appropriate location.
 
 
 ## Pre-requisites
@@ -58,6 +55,7 @@ To check the examples you should create a git directory and copy the input files
 You can put some of the files in a sub direcetory under the main directory (all nested directories are checked). 
 Open a terminal, 'cd' to the root git directory you created and type one of the following commands (each command is followed by it's output):
 - "$ git annotator --since" :
+
 	Adding since = 24-1-2017
 	Processing file './test/AuthorTag.java'... @since => 24-1-2017 
 	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @since => 24-1-2017 
@@ -67,12 +65,13 @@ Open a terminal, 'cd' to the root git directory you created and type one of the 
 	Processing file './test/NoJavadoc.java'... @since => 24-1-2017 
 	Done
 
-AllTags.java had all tags defined so it's javadoc hasn't changed.
-SinceTag.java had the @since tag defined so it's javadoc hasn't changed.
-NoTagsWithJavadoc.java and AuthorTag.java had javadoc but didn't have the @since tag defined so it was added with the defualt value (current date) since no value was given.
-ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all so javadoc with the @since tag was added with the defualt value (current date).
+    - AllTags.java had all tags defined so it's javadoc hasn't changed.
+    SinceTag.java had the @since tag defined so it's javadoc hasn't changed.
+    - NoTagsWithJavadoc.java and AuthorTag.java had javadoc but didn't have the @since tag defined so it was added with the defualt value (current date) since no value was given.
+    - ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all so javadoc with the @since tag was added with the defualt value (current date).
 
 - "$ git annotator --since today" :
+
 	Adding since = today
 	Processing file './test/AuthorTag.java'... @since => today 
 	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @since => today 
@@ -82,9 +81,10 @@ ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all
 	Processing file './test/NoJavadoc.java'... @since => today 
 	Done
 
-Same as before with a value defined by the user ("today") instead of the default value (current date).
+    - Same as before with a value defined by the user ("today") instead of the default value (current date).
 
 - "$ git annotator --author" :
+
 	Adding author = oded
 	Processing file './test/AuthorTag.java'... skipping
 	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @author => oded 
@@ -94,12 +94,13 @@ Same as before with a value defined by the user ("today") instead of the default
 	Processing file './test/NoJavadoc.java'... @author => oded 
 	Done
 
-AllTags.java had all tags defined so it's javadoc hasn't changed.
-AuthorTag.java had the @author tag defined so it's javadoc hasn't changed.
-NoTagsWithJavadoc.java and SinceTag.java had javadoc but didn't have the @author tag defined so it was added with the defualt value (Username of currently logged in user - "oded" ).
-ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all so javadoc with the @author tag was added with the defualt value.
+    - AllTags.java had all tags defined so it's javadoc hasn't changed.
+    AuthorTag.java had the @author tag defined so it's javadoc hasn't changed.
+    - NoTagsWithJavadoc.java and SinceTag.java had javadoc but didn't have the @author tag defined so it was added with the defualt value (Username of currently logged in user - "oded" ).
+    - ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all so javadoc with the @author tag was added with the defualt value.
 
 - "$ git annotator --author Avner" :
+
 	Adding author = Avner
 	Processing file './test/AuthorTag.java'... skipping
 	Processing file './test/ImportsAndAnnotationNoJavadoc.java'... @author => Avner 
@@ -109,7 +110,7 @@ ImportsAndAnnotationNoJavadoc.java and NoJavadoc.java didn't have javadoc at all
 	Processing file './test/NoJavadoc.java'... @author => Avner 
 	Done
 
-Same as before with a value defined by the user ("Avner") instead of the default value.
+    - Same as before with a value defined by the user ("Avner") instead of the default value.
 
 ## GitHub repository
 https://github.com/odedgr/plugin
