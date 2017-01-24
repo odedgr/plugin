@@ -1,9 +1,7 @@
 package what.ever;
 
-/**
- * @since now
- */
-public class NoTags {
+
+public class NoJavadoc {
     private int ryan;
 
     public NoTags() {

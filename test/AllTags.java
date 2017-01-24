@@ -1,14 +1,14 @@
 package what.ever;
 
-
-import java.util.arraylist;
-import java.util.list;
-
-@annotation
-public class NoTags {
+/**
+ *
+ * @since now
+ * @author me
+ */
+public class AllTags {
     private int ryan;
 
-    public NoTags() {
+    public AllTags() {
         ryan = 0;
     }
 

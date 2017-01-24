@@ -1,22 +1,15 @@
 package what.ever;
 
 /**
- * 
- * @since now
- * @author me
+ * @author somebody else
  */
-public class AllTags {
+public class AuthorTags {
     private int ryan;
 
-    public AllTags() {
+    public AuthorTags() {
         ryan = 0;
     }
 
-	/**
-	 * 
-	 * @since then
-	 * @author him
-	 */
     public class Dumdum {
         private int shtut;
 

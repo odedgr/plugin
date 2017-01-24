@@ -3,11 +3,17 @@
 import argparse
 import getpass
 import re
+import datetime
 from os import path, walk
 
 
 def print_version():
-    print("0.1")
+    """
+    Prints the current version of the plugin
+
+    :return: None
+    """
+    print("1.0")
 
 
 def find_javadoc(filename=None):
@@ -125,7 +131,6 @@ def position_before_class(content=None):
 
     pattern = r'^.*?class[^\n\r]*?[\n\r]'
     m = re.search(pattern, content, re.MULTILINE)
-    # print("m: {}".format(m))
 
     return m.start() - 1
 
@@ -151,14 +156,13 @@ def position_before_code(filename=None):
     last = None
     # next "empty" for loop is intended to advance iterator to last match
     for match in it:
-        # print("{} : {}".format(match.group(), match.span()))
         last = match
 
     if last is None:
         # no imports in file
         return position_before_class(content)
     else:
-        # found import lines - last hold last match in file
+        # found import lines - last holds last match in file
         return last.end()
 
 
@@ -174,6 +178,7 @@ def write_updated_content(filename, updated_jdoc):
     with open(filename, 'r+') as f:
         java_doc_location = find_javadoc(filename)
         original_text = f.read()
+
         if java_doc_location is None:
             # this is when no java doc is present
             imports_end = position_before_code(filename)
@@ -219,6 +224,7 @@ def update_tags(since=None, author=None):
 
     # in python 3.5+ we can use the following commented line to get a list of *.java files
     # glob.glob('./**/*.java', recursive=True):
+    # but we keep the following for backward compatibility
 
     files = [path.join(dirpath, f)
              for dirpath, _, files in walk('.')
@@ -228,6 +234,7 @@ def update_tags(since=None, author=None):
         print("Found no relevant *.java files in the project");
         return
 
+    # go over found *.java files and do actual javadoc updating
     for f in files:
         print("Processing file '{}'... ".format(f), end="")
 
@@ -235,58 +242,65 @@ def update_tags(since=None, author=None):
         updated_since = None if has_since_tag(jdoc) else since
         updated_author = None if has_author_tag(jdoc) else author
 
-        # print("after check: since= {}, author= {}".format(updated_since, updated_author))
-
         if updated_since is None and updated_author is None:
             print("skipping")
             continue
 
         line = ""
 
+        # user printed feedback
         if updated_since is not None:
-            line += "since ==> @since: {} ".format(updated_since)
+            line += "@since => {} ".format(updated_since)
 
         if updated_author is not None:
-            line += "author==> @author: {} ".format(updated_author)
+            line += "@author => {} ".format(updated_author)
 
         print(line)
 
         insert_tags(f, jdoc, updated_since, updated_author)
 
 
-def do_hard_work(since=None, author=None):
-    if since:
-        print("Adding since = {}".format(since))
+def create_parser():
+    """
+    Create the argument parser, tailor made for the plugin's (optional) arguments.
 
-    if author:
-        print("Adding author = {}".format(author))
+    This is a helper method, that just encapsulates the parser's creation and configuration which includes the flags and
+    arguments definition as well as default values for them.
 
-    update_tags(since, author)
-
-    print("Done")
-
-
-def main():
+    :return: Fully configured parser for the plugin to be used on current arguments
+    """
+    now = datetime.datetime.today()
+    default_date = "{}-{}-{}".format(now.day, now.month, now.year)
     parser = argparse.ArgumentParser(description="Git plugin for automatic insertion of @since and @author annotations "
                                                  "into *.java source files in a project.",
                                      epilog="© Avner & Oded")
     parser.add_argument("-v", "--version", help="Display the version of this plugin", action='store_true')
-    parser.add_argument("--since", nargs='?', help="Add the @since annotations to project")
+    parser.add_argument("--since", nargs='?', help="Add the @since annotations to project", const=default_date)
     parser.add_argument("--author", nargs='?', help="Add the @author annotations to project", const=getpass.getuser())
 
+    return parser
+
+
+def main():
+    parser = create_parser()
     args = parser.parse_args()
 
     if args.version:
         print_version()
         return
 
-    if args.since is None and args.author is None:
+    selected = [(arg, name) for (arg, name) in [(args.since, "since"), (args.author, "author")] if arg is not None]
+
+    if not selected:
         print("No option selected.")
         return
 
-    print("since = {}, author = {}".format(args.since, args.author))
+    for arg, name in selected:
+        print("Adding {} = {}".format(name, arg))
 
-    do_hard_work(args.since, args.author)
+    update_tags(args.since, args.author)
+
+    print("Done")
 
 
 if __name__ == "__main__":

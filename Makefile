@@ -2,7 +2,7 @@
 GIT_PATH := $(shell which git)
 BIN_DIR  := $(shell dirname $(GIT_PATH))
 BIN_DIR  := /usr/local/bin
-PLUGIN   = ./git-plugin
+PLUGIN   = ./git-annotator
 
 all:
 	@echo "Usage: sudo make [install|uninstall]"

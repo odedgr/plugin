@@ -3,7 +3,7 @@ package what.ever;
 /**
  * No tags here
  */
-public class NoTags {
+public class NoTagsWithJavadoc {
     private int ryan;
 
     public NoTags() {
